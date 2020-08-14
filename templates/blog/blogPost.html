@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %} blogPost
+{% endblock title %}
+
+{% block body %}
+{% load humanize %}
+
+<div class="container my-4">
+  <div class="blog-post">
+    <h2 class="blog-post-title">{{post.title}}</h2>
+    <p class="blog-post-meta">{{post.timeStamp}} by <a href="#">{{post.author}}</a></p>
+
+    <p>{{post.content}}</p>
+  </div>
+</div>
+
+<div class="container">
+  <h2>Comments : ({{comments.count}})</h2>
+  <div class="my-2">
+    {% if user.is_authenticated %}
+    <form action="/blog/postComment" method="post">
+      {% csrf_token %}
+      <div class="form-group">
+        <label for="exampleInputEmail1">Comment here : </label>
+        <input type="text" class="form-control" name="comment" aria-describedby="commentHelp">
+      </div>
+      <input type="hidden" name="postSno" value="{{post.sno}}">
+      <input type="hidden" name="parentSno" value="">
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+    {% else %}
+    <p>Please login to post a comment.</p>
+    {% endif %}
+  </div>
+
+  {% for comment in comments %}
+  <div class="row my-3">
+    <div class="col-md-1"><img class="rounded mx-auto d-block w-100 p-2" src="/static/img/user.png" alt="Image"></div>
+    <div class="col-md-11"><b>{{comment.user.username}}</b> <span
+        class="badge badge-secondary">({{comment.timestamp | naturaltime}})</span>
+      <div>{{comment.comment}}</div>
+      <div class="reply mx-0">
+
+
+        <button class="btn btn-sm btn-primary mt-2" type="button" data-toggle="collapse"
+          data-target="#replyBox{{comment.sno}}" aria-expanded="false" aria-controls="replyBox{{comment.sno}}">
+          Reply
+        </button>
+
+        <div class="collapse mt-2" id="replyBox{{comment.sno}}">
+          <div class="card card-body">
+            <form action="/blog/postComment" method="post">
+              {% csrf_token %}
+              <div class="form-group">
+                <label for="comment">Reply here : </label>
+                <input type="text" class="form-control" name="comment" aria-describedby="commentHelp">
+                <input type="hidden" name="parentSno" value="{{comment.sno}}">
+              </div>
+              <input type="hidden" name="postSno" value="{{post.sno}}">
+              <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+{% endblock body %}
