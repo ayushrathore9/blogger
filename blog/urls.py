@@ -1,3 +1,4 @@
+# The urls of my blogging site will come here
 from django.contrib import admin
 from django.urls import path, include
 from blog import views
